@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from db.db import Base, engine
 from routers.category_router import router as category_router
 from routers.product_router import router as product_router
+from routers.stock_movement_router import router as stock_movement_router   
+
 app = FastAPI(title="E-commerce API", version="1.0.0")
 
 @app.on_event("startup")
@@ -18,3 +20,4 @@ app.add_middleware(
 )
 app.include_router(category_router)
 app.include_router(product_router)
+app.include_router(stock_movement_router)

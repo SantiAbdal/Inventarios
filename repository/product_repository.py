@@ -85,5 +85,25 @@ class ProductRepository:
             .all()
         )
     
+    # ---------------------------
+    # Búsquedas específicas
+    # ---------------------------
+
+    def get_by_name(self, name: str) -> ProductModel | None:
+        return (
+            self.db.query(ProductModel)
+            .filter(ProductModel.name.ilike(f"%{name}%"))
+            .first()
+        )
     
+    def get_by_sku(self, sku: str) -> ProductModel | None:
+        return (
+            self.db.query(ProductModel)
+            .filter(ProductModel.sku == sku)
+            .first()
+        )
     
+    # ---------------------------
+    
+    def get_low_stock(self):
+        return (self.db.query(ProductModel).filter(ProductModel.stock <= ProductModel.stock_min).all())
