@@ -68,3 +68,13 @@ def search_by_range(field: str, min_value: float | None, max_value: float | None
 def search_by_category_name(category_name: str,db: Session = Depends(get_db)):
     service = ProductService()
     return service.search_by_category_name(db, category_name)
+
+@router.post("/{product_id}/reduce_stock")
+def reduce_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+    service = ProductService()
+    return service.reduce_stock(db, sku, quantity)
+
+@router.post("/{product_id}/increase_stock")
+def increase_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+    service = ProductService()
+    return service.increase_stock(db, sku, quantity)
