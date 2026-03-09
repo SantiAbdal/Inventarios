@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from schemas.category_schema import Category
 from schemas.product_condition_schema import ProductCondition
 
@@ -54,5 +54,4 @@ class Product(ProductBase):
     id: int
     category: Category
 
-    class Config:
-        from_attributes = True  # importante si usás SQLAlchemy ORM
+    model_config = ConfigDict(from_attributes=True)  

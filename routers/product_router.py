@@ -1,56 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from db.db import SessionLocal
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from db.db import SessionLocal
 from services.product_services import ProductService
 from schemas.product_schema import ProductCreate, ProductUpdate, Product
+from db.dependencies import get_db
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@router.get("/{product_id}", response_model=Product)
-def get_product(product_id: int, db: Session = Depends(get_db)):
-    service = ProductService()
-    return service.get_product_by_id(db, product_id)
-
-
-@router.get("", response_model=list[Product])
-def get_all_products(db: Session = Depends(get_db)):
-    service = ProductService()
-    return service.get_all_products(db)
-
-
-@router.post("", response_model=Product, status_code=201)
-def create_product(product: ProductCreate, db: Session = Depends(get_db)):
-    service = ProductService()
-    return service.create_product(db, product)
-
-
-@router.put("/{product_id}", response_model=Product)
-def update_product(product_id: int, product_update: ProductUpdate, db: Session = Depends(get_db)):
-    service = ProductService()
-    return service.update_product(db, product_id, product_update)
-
-
-@router.delete("/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db)):
-    service = ProductService()
-    service.delete_product(db, product_id)
-    return {"detail": "Product deleted successfully"}
+# ---------------------------
+# Búsquedas (van ANTES de /{product_id})
+# ---------------------------
 
 @router.get("/search/text", response_model=list[Product])
-def search_by_text(field: str,value: str,db: Session = Depends(get_db)):
+def search_by_text(field: str, value: str, db: Session = Depends(get_db)):
     service = ProductService()
     return service.search_by_text(db, field, value)
 
@@ -65,16 +27,42 @@ def search_by_range(field: str, min_value: float | None, max_value: float | None
     return service.search_by_range(db, field, min_value, max_value)
 
 @router.get("/search/category", response_model=list[Product])
-def search_by_category_name(category_name: str,db: Session = Depends(get_db)):
+def search_by_category_name(category_name: str, db: Session = Depends(get_db)):
     service = ProductService()
     return service.search_by_category_name(db, category_name)
 
-@router.post("/{product_id}/reduce_stock")
-def reduce_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+@router.get("/low-stock", response_model=list[Product])
+def get_low_stock(db: Session = Depends(get_db)):
     service = ProductService()
-    return service.reduce_stock(db, sku, quantity)
+    return service.get_low_stock_products(db)
 
-@router.post("/{product_id}/increase_stock")
-def increase_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+
+# ---------------------------
+# CRUD básico (van DESPUÉS)
+# ---------------------------
+
+@router.get("", response_model=list[Product])
+def get_all_products(db: Session = Depends(get_db)):
     service = ProductService()
-    return service.increase_stock(db, sku, quantity)
+    return service.get_all_products(db)
+
+@router.get("/{product_id}", response_model=Product)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    service = ProductService()
+    return service.get_product_by_id(db, product_id)
+
+@router.post("", response_model=Product, status_code=201)
+def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+    service = ProductService()
+    return service.create_product(db, product)
+
+@router.put("/{product_id}", response_model=Product)
+def update_product(product_id: int, product_update: ProductUpdate, db: Session = Depends(get_db)):
+    service = ProductService()
+    return service.update_product(db, product_id, product_update)
+
+@router.delete("/{product_id}")
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    service = ProductService()
+    service.delete_product(db, product_id)
+    return {"detail": "Product deleted successfully"}

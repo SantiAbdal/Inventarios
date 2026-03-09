@@ -1,16 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db.db import SessionLocal
 from services.category_services import CategoryService
 from schemas.category_schema import CategoryCreate, CategoryUpdate, Category
+from db.dependencies import get_db
 router = APIRouter(prefix="/categories", tags=["Categories"])
 category_service: CategoryService = CategoryService()
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db    
-    finally:
-        db.close()
 
 ## Obtener categoria por ID
 @router.get("/{category_id}", response_model=Category)

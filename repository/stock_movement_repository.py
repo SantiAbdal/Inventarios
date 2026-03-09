@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from models.stock_movement_model import StockMovement
+from schemas.movement_type_schema import MovementType
 
 
 class StockMovementRepository:
@@ -7,7 +8,7 @@ class StockMovementRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, product_id: int, movement_type: str, quantity: int):
+    def create(self, product_id: int, movement_type: MovementType, quantity: int):
         movement = StockMovement(
             product_id=product_id,
             movement_type=movement_type,
