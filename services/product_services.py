@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from repository.product_repository import ProductRepository
 from schemas.product_schema import ProductCreate, ProductUpdate
 from repository.stock_movement_repository import StockMovementRepository
-
+from schemas.movement_type_schema import MovementType
 class ProductService:
 
     ALLOWED_RANGE_FIELDS = {"price", "cost", "start_date"}
@@ -142,7 +142,7 @@ class ProductService:
             raise HTTPException(status_code=400,detail="Insufficient stock")
 
         product.stock -= quantity
-        movement_repo.create(product_id=product.id,movement_type="OUT",quantity=quantity)
+        movement_repo.create(product_id=product.id,movement_type=MovementType.OUT,quantity=quantity)
 
         if product.stock < 0:
             raise HTTPException(status_code=400,detail="Stock cannot be negative")
@@ -162,9 +162,17 @@ class ProductService:
             raise HTTPException(status_code=404, detail="Product not found")
 
         product.stock += quantity
-        movement_repo.create(product_id=product.id,movement_type="IN",quantity=quantity)
+        movement_repo.create(product_id=product.id,movement_type=MovementType.IN,quantity=quantity)
         return product_repo.save(product)
    
     def get_low_stock_products(self, db: Session):
         repo = ProductRepository(db)
         return repo.get_low_stock()
+    
+    def get_stock_history(self, db: Session, sku: str):
+        product_repo = ProductRepository(db)
+        product = product_repo.get_by_sku(sku)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        movement_repo = StockMovementRepository(db)
+        return movement_repo.get_by_product(product.id)

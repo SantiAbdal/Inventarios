@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 
 class CategoryBase(BaseModel):
@@ -13,5 +13,4 @@ class CategoryUpdate(BaseModel):
 class Category(CategoryBase):    
     id: int
 
-    class Config:
-        from_attributes = True  
+    model_config = ConfigDict(from_attributes=True)
