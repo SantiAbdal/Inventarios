@@ -5,7 +5,7 @@ from db.db import Base, engine
 from routers.category_router import router as category_router
 from routers.product_router import router as product_router
 from routers.stock_movement_router import router as stock_movement_router
-
+from routers.auth_router import router as auth_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
@@ -23,3 +23,4 @@ app.add_middleware(
 app.include_router(category_router)
 app.include_router(product_router)
 app.include_router(stock_movement_router)
+app.include_router(auth_router)

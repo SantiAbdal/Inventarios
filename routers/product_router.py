@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from services.product_services import ProductService
 from schemas.product_schema import ProductCreate, ProductUpdate, Product
-from db.dependencies import get_db
+from db.dependencies import get_db, get_current_user
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -52,17 +52,17 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     return service.get_product_by_id(db, product_id)
 
 @router.post("", response_model=Product, status_code=201)
-def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+def create_product(product: ProductCreate, db: Session = Depends(get_db),current_user = Depends(get_current_user)):
     service = ProductService()
     return service.create_product(db, product)
 
 @router.put("/{product_id}", response_model=Product)
-def update_product(product_id: int, product_update: ProductUpdate, db: Session = Depends(get_db)):
+def update_product(product_id: int, product_update: ProductUpdate, db: Session = Depends(get_db),current_user = Depends(get_current_user)):
     service = ProductService()
     return service.update_product(db, product_id, product_update)
 
 @router.delete("/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db)):
+def delete_product(product_id: int, db: Session = Depends(get_db),current_user = Depends(get_current_user)):
     service = ProductService()
     service.delete_product(db, product_id)
     return {"detail": "Product deleted successfully"}

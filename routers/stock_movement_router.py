@@ -2,18 +2,18 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from services.product_services import ProductService
 from schemas.stock_movement_schemas import StockMovementResponse
-from db.dependencies import get_db
+from db.dependencies import get_db, get_current_user
 
 router = APIRouter(prefix="/stock", tags=["Stock"])
 
 service = ProductService()
 
 @router.post("/in/{sku}")
-def increase_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+def increase_stock(sku: str, quantity: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return service.increase_stock(db, sku, quantity)
 
 @router.post("/out/{sku}")
-def reduce_stock(sku: str, quantity: int, db: Session = Depends(get_db)):
+def reduce_stock(sku: str, quantity: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return service.reduce_stock(db, sku, quantity)
 
 @router.get("/history/{sku}", response_model=list[StockMovementResponse])
