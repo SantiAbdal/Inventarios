@@ -106,6 +106,12 @@ Instalar dependencias:
 
     pip install -r requirements.txt
 
+Configurar variables de entorno:
+
+    cp .env.example .env
+
+Completar los valores en el archivo `.env` generado.
+
 ---
 
 ## Ejecutar la API
